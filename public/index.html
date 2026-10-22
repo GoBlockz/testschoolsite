@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3ed">
+  <meta name="description" content="Commonroom is a place to share what you are into and talk with people who get it.">
+  <title>Commonroom — find your people</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Commonroom home"><span class="brand-mark"><svg class="icon"><use href="/icons.svg#i-mark"></use></svg></span><span>commonroom</span></a>
+      <label class="search-box"><svg class="icon"><use href="/icons.svg#i-search"></use></svg><input id="search-input" type="search" placeholder="Find a conversation" aria-label="Search conversations"></label>
+      <div class="account-actions" id="account-actions"><button class="button button-text" data-open-auth="login">Log in</button><button class="button button-primary" data-open-auth="signup">Join the room</button></div>
+      <div class="member-actions" id="member-actions" hidden>
+        <button class="profile-trigger" id="profile-trigger" aria-label="Edit your profile"></button>
+        <button class="button button-icon admin-trigger" id="admin-trigger" aria-label="Open admin panel" title="Admin panel" hidden><svg class="icon"><use href="/icons.svg#i-shield"></use></svg></button>
+        <button class="button button-text" id="logout-button">Log out</button>
+      </div>
+    </header>
+
+    <div class="page-grid">
+      <aside class="sidebar">
+        <div class="sidebar-heading"><span>Places to talk</span><span class="sidebar-heading-rule"></span></div>
+        <nav class="room-nav" id="room-nav" aria-label="Forum rooms"></nav>
+        <div class="sidebar-footer"><span class="tiny-mark"><svg class="icon"><use href="/icons.svg#i-mark"></use></svg></span><p>Good conversations start with showing up.</p></div>
+      </aside>
+
+      <main class="main-column">
+        <section class="page-heading">
+          <div class="section-kicker"><span class="kicker-line"></span><span id="room-kicker">A little bit of everything</span></div>
+          <div class="heading-row"><div><h1 id="room-title">The common room</h1><p id="room-description">The good, the weird, the in-between. Pull up a chair.</p></div><div class="room-total" id="room-total"></div></div>
+        </section>
+
+        <nav class="feed-tabs" aria-label="Sort conversations">
+          <button class="feed-tab active" data-sort="recent">Latest</button>
+          <button class="feed-tab" data-sort="popular">Popular</button>
+          <button class="feed-tab" data-sort="live"><span class="live-dot"></span>Live</button>
+        </nav>
+
+        <form class="composer" id="post-form">
+          <div class="composer-main"><div class="composer-avatar" id="composer-avatar"></div><textarea id="post-body" maxlength="1200" placeholder="Start a conversation…" aria-label="Write a post"></textarea></div>
+          <div class="composer-tools">
+            <label class="room-select-wrap"><span>Posting in</span><select id="compose-room" aria-label="Post in room"></select></label>
+            <label for="media-input" class="media-button"><svg class="icon"><use href="/icons.svg#i-photo"></use></svg><span>Photo / video</span></label>
+            <input id="media-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" hidden>
+            <span class="file-label" id="file-label"></span>
+            <button class="button button-primary post-button" type="submit"><span>Post</span><svg class="icon"><use href="/icons.svg#i-send"></use></svg></button>
+          </div>
+          <p class="inline-message" id="post-message" aria-live="polite"></p>
+        </form>
+
+        <section class="posts" id="posts" aria-live="polite"></section>
+      </main>
+
+      <aside class="right-rail">
+        <section class="rail-block"><div class="rail-heading"><h2>A room to wander into</h2><svg class="icon"><use href="/icons.svg#i-spark"></use></svg></div><div class="discovery-list" id="discovery-list"></div></section>
+        <section class="community-note"><span class="note-mark"><svg class="icon"><use href="/icons.svg#i-heart"></use></svg></span><h2>Say it like a person.</h2><p>Swear if you need to. Just don’t use slurs or make this place worse for someone else.</p></section>
+        <p class="site-note">A shared room, made by the people in it.</p>
+      </aside>
+    </div>
+  </div>
+
+  <dialog class="dialog" id="auth-dialog">
+    <form class="dialog-panel auth-panel" id="auth-form">
+      <div class="dialog-top"><div><span class="dialog-kicker">COMMONROOM</span><h2 id="auth-title">Come on in.</h2><p id="auth-description">Make yourself at home.</p></div><button class="icon-close" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="/icons.svg#i-x"></use></svg></button></div>
+      <label class="field-label">Username<input id="auth-username" name="username" autocomplete="username" minlength="3" maxlength="20" required></label>
+      <label class="field-label" id="admin-setup-field" hidden>Admin setup key<input id="admin-setup-key" name="adminSetupKey" type="password" autocomplete="off"><small>Use the one-time setup key from your hosting settings.</small></label>
+      <label class="field-label">Password<input id="auth-password" name="password" type="password" autocomplete="current-password" minlength="10" maxlength="128" required></label>
+      <p class="form-error" id="auth-error" aria-live="polite"></p>
+      <button class="button button-primary dialog-submit" id="auth-submit" type="submit">Log in</button>
+      <p class="dialog-switch" id="auth-switch"></p>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="profile-dialog">
+    <form class="dialog-panel" id="profile-form">
+      <div class="dialog-top"><div><span class="dialog-kicker">YOUR CORNER</span><h2>Edit your profile</h2><p>Give people a little sense of who you are.</p></div><button class="icon-close" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="/icons.svg#i-x"></use></svg></button></div>
+      <div class="profile-preview" id="profile-preview"></div>
+      <label class="field-label">Profile photo<input id="avatar-input" name="avatar" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+      <label class="field-label">Display name<input id="display-name" name="displayName" maxlength="40" required></label>
+      <label class="field-label">About you<textarea id="profile-bio" name="bio" maxlength="160" rows="3"></textarea></label>
+      <p class="form-error" id="profile-error" aria-live="polite"></p>
+      <button class="button button-primary dialog-submit" type="submit">Save profile</button>
+    </form>
+  </dialog>
+
+  <dialog class="dialog admin-dialog" id="admin-dialog">
+    <section class="dialog-panel admin-panel">
+      <div class="dialog-top"><div><span class="dialog-kicker">ROOMKEEPER</span><h2>Admin desk</h2><p>Keep the room welcoming and running smoothly.</p></div><button class="icon-close" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="/icons.svg#i-x"></use></svg></button></div>
+      <div class="admin-totals" id="admin-totals"></div>
+      <section class="admin-section"><div class="admin-section-title"><h3>People</h3><span>Account access</span></div><div class="admin-list" id="admin-users"></div></section>
+      <section class="admin-section"><div class="admin-section-title"><h3>Recent posts</h3><span>Remove anything that breaks the rules</span></div><div class="admin-list" id="admin-posts"></div></section>
+    </section>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
